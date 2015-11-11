@@ -1,0 +1,87 @@
+﻿@model SND.Models.CompanyModel
+
+<div class="row">
+    <h3>Company</h3>
+</div>
+
+<div class="row">
+    <form>
+        <div class="form-group">
+            <label for="exampleInputEmail1">업장명</label>
+            <input type="text" class="form-control" id="txtName" placeholder="업장명" value="@(Model.ComName != null ? Model.ComName : "")">
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">업장 주소</label>
+            <input type="text" class="form-control" id="txtAddr" placeholder="업장 주소" value="@(Model.ComName != null ? Model.ComAddr : "")">
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">업장 전화번호</label>
+            <input type="tel" class="form-control" id="txtTell" placeholder="업장 전화번호" value="@(Model.ComName != null ? Model.ComTell : "")">
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">사업자명</label>
+            <input type="text" class="form-control" id="txtCeoNm" placeholder="사업자명" value="@(Model.ComName != null ? Model.ComCeoName : "")">
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">사업자 전화번호</label>
+            <input type="tel" class="form-control" id="txtCeoTell" placeholder="사업자 전화번호" value="@(Model.ComName != null ? Model.ComCeoTell : "")">
+        </div>
+        <input type="hidden" id="hidId" value="@(Model.ComName != null ? Model.Id.ToString() : "")" />
+    </form>
+</div>
+<div class="row" style="text-align:center;">
+    <button type="button" class="btn btn-success" id="btnSave">Save</button>
+    <button type="button" class="btn btn-warning" id="btnCancle">Cancle</button>
+    @if (Model.ComTell != null) 
+    { 
+        <button type="button" class="btn btn-danger" id="btnDel">Delete</button>
+    }
+</div>
+
+@section scripts{
+<script type="text/javascript">
+    $(function () {
+        $("#btnSave").click(function () {
+            Page.Save();
+        });
+        $("#btnDel").click(function () {
+            Page.Del();
+        });
+        $("#btnCancle").click(function () {
+            location.href = '@Url.Action("Index")';
+        });
+    });
+
+    var Page = {
+        Save: function () {
+            var data = Utill.Ajax("@Url.Action("Insert")", {
+                name: $("#txtName").val(),
+                tell: $("#txtTell").val(),
+                addr: $("#txtAddr").val(),
+                ceoName: $("#txtCeoNm").val(),
+                ceoTell: $("#txtCeoTell").val(),
+                id: $("#hidId").val()
+            });
+
+            if (data) {
+                location.href = "@Url.Action("Index")";
+            }
+            else {
+                alert('Fail.......');
+            }
+        },
+        Del: function () {
+            var data = Utill.Ajax("@Url.Action("Delete")", {
+                id: $("#hidId").val()
+            });
+
+            if (data) {
+                location.href = "@Url.Action("Index")";
+            }
+            else {
+                alert('Fail.......');
+            }
+        }
+    }
+</script>
+}

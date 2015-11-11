@@ -1,0 +1,81 @@
+﻿<div class="row">
+    <h3>Bom</h3>
+</div>
+
+<div class="row">
+    <form>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Bom Category</label>
+            <select id="selCategory" class="form-control"></select>
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Bom Name</label>
+            <input type="text" class="form-control" id="txtName" placeholder="Bom 명">
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Bom Unit</label>
+            <input type="text" class="form-control" id="txtUnit" placeholder="Ex : KG, L, 개">
+        </div>
+
+    </form>
+</div>
+
+<div class="row" style="text-align:center;">
+    <button type="button" class="btn btn-success" id="btnSave">Save</button>
+    <button type="button" class="btn btn-warning" id="btnCancle">Cancle</button>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            Page.SelectCategory();
+            $("#btnSave").click(function () {
+                Page.Save();
+            });
+            $("#btnCancle").click(function () {
+                location.href = '@Url.Action("Bom")';
+            });
+        });
+
+        var Page = {
+            Save: function () {
+                var data = Utill.Ajax("@Url.Action("BomInsert")", {
+                    name: $("#txtName").val(),
+                    category: $("#selCategory").val(),
+                    unit: $("#txtUnit").val()
+                });
+
+                if (data) {
+                    location.href = "@Url.Action("Bom")";
+                }
+                else {
+                    alert('Fail.......');
+                }
+            },
+            Del: function () {
+                var data = Utill.Ajax("@Url.Action("BomDelete")", {
+                    id: $("#hidId").val()
+                });
+
+                if (data) {
+                    location.href = "@Url.Action("Bom")";
+                }
+                else {
+                    alert('Fail.......');
+                }
+            },
+            SelectCategory: function () {
+                var data = Utill.Ajax("@Url.Action("GetCategory")");
+                var html = '';
+                $.each(data, function (index, value) {
+                    html += "<option value='" + value.Id.toString() + "'>" + value.BomCategoryName + "</option>";
+                    console.log(value.Id.valueOf());
+                });
+                $("#selCategory").append(html);
+
+            }
+        }
+    </script>
+}

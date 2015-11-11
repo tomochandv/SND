@@ -1,0 +1,159 @@
+﻿@model SND.Models.ProductModel
+
+<div class="row">
+    <h3>Product Save</h3>
+</div>
+
+<div class="row">
+    <form method="post" action="@Url.Action("ProductUpdate")" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="exampleInputEmail1">Product Category</label>
+            <select id="selCategory" name="selCategory" class="form-control"></select>
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Product Use</label>
+            <select id="selUse" name="selUse" class="form-control">
+                <option value="0">Yes</option>
+                <option value="1">No</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Product Name</label>
+            <input type="text" class="form-control" name="txtName" placeholder="Name">
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Price</label>
+            <input type="number" class="form-control" name="txtPrice" placeholder="price">
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Sale Price</label>
+            <input type="number" class="form-control" name="txtSalePrice" value="0">
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Sale Price</label>
+            <input type="number" class="form-control" name="txtSalePrice" value="0">
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Description</label>
+            <textarea class="form-control" rows="3" name="txtDesc"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Image</label>
+            <div class="btn-group btn-group-xs" role="group" aria-label="...">
+                <button type="button" class="btn btn-default" aria-label="Left Align" id="btnPlus">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="btn btn-default" aria-label="Center Align" id="btnMinus">
+                    <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="form-group" id="divFile">
+            <input type="file" name="txtFile" class="form-control">
+        </div>
+
+        <input type="hidden" name="id" id="id" value="@ViewBag.id" />
+    </form>
+
+    <div class="row">
+        @if (Model.ImagUrl != null && Model.ImagUrl.Count > 0)
+        {
+            for (int i = 0; i < Model.ImagUrl.Count; i++)
+            {
+                <div class="col-xs-6 col-md-3" id="divImg_@i">
+                    <a href="javascript:Page.ImageDelete('@Model.ImagUrl[i]', 'divImg_@i')" class="thumbnail">
+                        <img style="width:171px;height:180px" src="/Upload/@Model.ImagUrl[i]" alt="...">
+                    </a>
+                </div>
+            }
+
+        }
+    </div>
+</div>
+
+
+
+<div class="row" style="text-align:center;">
+    <button type="button" class="btn btn-success" id="btnSave">Save</button>
+    <button type="button" class="btn btn-danger" id="btnDelete">Delete</button>
+    <button type="button" class="btn btn-warning" id="btnCancle">Cancle</button>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+    $(function () {
+        Page.SelectCategory();
+        Page.Load();
+        $("#btnSave").click(function () {
+            Page.Save();
+        });
+        $("#btnCancle").click(function () {
+            location.href = '@Url.Action("Product")';
+        });
+        $("#btnPlus").click(function () {
+            Page.ImageButtonClick("A");
+        });
+        $("#btnMinus").click(function () {
+            Page.ImageButtonClick("M");
+        });
+        $("#btnDelete").click(function () {
+            Page.Delete();
+        });
+    });
+
+    var Page = {
+        Load: function () {
+            $("#selCategory").val('@Model.ProductCategory.Id.ToString()');
+            $("#selUse").val('@(Model.UseYn == true ? "0" : "1")');
+            $("[name=txtName]").val('@Model.ProductNm');
+            $("[name=txtPrice]").val('@Model.Price');
+            $("[name=txtSalePrice]").val('@Model.PriceSale');
+            $("[name=txtDesc]").val('@Model.Description');
+        },
+        ImageButtonClick : function(type){
+            if (type == "A") {
+                var html = "<input type=\"file\" name=\"txtFile\" class=\"form-control\">";
+                $("#divFile").append(html);
+            }
+            else {
+                var len = $("[name=txtFile]").length;
+                if (len > 1) {
+                    len = $("[name=txtFile]").eq(len - 1).remove();
+                }
+            }
+        },
+        Save: function () {
+            $("form").submit();
+        },
+        SelectCategory: function () {
+            var data = Utill.Ajax("@Url.Action("GetCategory")");
+            var html = '';
+            $.each(data, function (index, value) {
+                html += "<option value='" + value.Id.toString() + "'>" + value.name + "</option>";
+                console.log(value.Id.valueOf());
+            });
+            $("#selCategory").append(html);
+
+        },
+        Delete: function () {
+            var data = Utill.Ajax("@Url.Action("ProductDelete")", { id: $("#id").val() });
+            if (data) {
+                location.href = '@Url.Action("Product")';
+            }
+        },
+        ImageDelete: function (name, id) {
+            var message = "정말 삭제 하시겠습니까?";
+            if (confirm(message)) {
+                var data = Utill.Ajax("@Url.Action("ImageDelet")", { name: name, id: '@ViewBag.id' });
+                $("#" + id).remove();
+            }
+        }
+    }
+    </script>
+}

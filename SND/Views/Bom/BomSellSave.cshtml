@@ -1,0 +1,124 @@
+﻿<div class="row">
+    <h3>Bom</h3>
+</div>
+
+<div class="row">
+    <form>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Bom Category</label>
+            <select id="selCategory" class="form-control"></select>
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Bom</label>
+            <select id="selBom" class="form-control"></select>
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">OutCompany</label>
+            <select id="selOut" class="form-control"></select>
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Date</label>
+            <input type="text" class="form-control" id="txtDate" value="@DateTime.Now.ToShortDateString()">
+        </div>
+        <div class="form-group">
+            <label for="exampleInputEmail1">Price</label>
+            <input type="number" class="form-control" id="txtPrice" placeholder="price">
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Qty</label>
+            <input type="number" class="form-control" id="txtQty" placeholder="qty">
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Total Price</label>
+            <input type="number" class="form-control" id="txtTotal" placeholder="qty">
+        </div>
+
+    </form>
+</div>
+
+<div class="row" style="text-align:center;">
+    <button type="button" class="btn btn-success" id="btnSave">Save</button>
+    <button type="button" class="btn btn-warning" id="btnCancle">Cancle</button>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+    $(function () {
+        Page.SelectCategory();
+        Page.SelectBom();
+        Page.SelctOutcompany();
+        $("#btnSave").click(function () {
+            Page.Save();
+        });
+        $("#btnCancle").click(function () {
+            location.href = '@Url.Action("BomSell")';
+        });
+        $("#selCategory").change(function () {
+            Page.SelectBom();
+        });
+        $("#txtPrice, #txtQty").bind("change, blur, keypress, keydown, keyup", function () {
+            Page.CalculateTotal();
+        });
+    });
+
+    var Page = {
+        Save: function () {
+            Page.CalculateTotal();
+            var data = Utill.Ajax("@Url.Action("BomSellInsert")", {
+                bomId: $("#selBom").val(),
+                catid: $("#selCategory").val(),
+                outId: $("#selOut").val(),
+                date: $("#txtDate").val(),
+                price: $("#txtPrice").val(),
+                qty: $("#txtQty").val(),
+                totalPrice: $("#txtTotal").val()
+            });
+
+            if (data) {
+                location.href = "@Url.Action("BomSell")";
+            }
+            else {
+                alert('Fail.......');
+            }
+        },
+        SelectCategory: function () {
+            var data = Utill.Ajax("@Url.Action("GetCategory")");
+                var html = '';
+                $.each(data, function (index, value) {
+                    html += "<option value='" + value.Id.toString() + "'>" + value.BomCategoryName + "</option>";
+                    console.log(value.Id.valueOf());
+                });
+                $("#selCategory").append(html);
+
+        },
+        SelectBom: function () {
+            var data = Utill.Ajax("@Url.Action("GetBomList")", {catid : $("#selCategory").val()} );
+            var html = '';
+            $.each(data, function (index, value) {
+                html += "<option value='" + value.Id.toString() + "'>" + value.BomName + "</option>";
+                console.log(value.Id.valueOf());
+            });
+            $("#selBom > option").remove();
+            $("#selBom").append(html);
+
+        },
+        SelctOutcompany: function () {
+            var data = Utill.Ajax("@Url.Action("GetOutCompany")");
+            var html = '';
+            $.each(data, function (index, value) {
+                html += "<option value='" + value.Id.toString() + "'>" + value.OutComName + "</option>";
+                console.log(value.Id.valueOf());
+            });
+            $("#selOut").append(html);
+        },
+        CalculateTotal: function () {
+            var qty = $("#txtQty").val();
+            var price = $("#txtPrice").val();
+            var total = Number(qty) * Number(price);
+            $("#txtTotal").val(total);
+        }
+    }
+    </script>
+}

@@ -1,0 +1,113 @@
+﻿<div class="row">
+    <h3>Product Save</h3>
+</div>
+
+<div class="row">
+    <form method="post" action="@Url.Action("ProductInsert")" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="exampleInputEmail1">Product Category</label>
+            <select id="selCategory" name="selCategory" class="form-control"></select>
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Product Name</label>
+            <input type="text" class="form-control" name="txtName" placeholder="Name">
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Price</label>
+            <input type="number" class="form-control" name="txtPrice" placeholder="price">
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Sale Price</label>
+            <input type="number" class="form-control" name="txtSalePrice" value="0">
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Description</label>
+            <textarea class="form-control" rows="3" name="txtDesc"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="exampleInputEmail1">Image</label>
+            <div class="btn-group btn-group-xs" role="group" aria-label="...">
+                <button type="button" class="btn btn-default" aria-label="Left Align" id="btnPlus">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="btn btn-default" aria-label="Center Align" id="btnMinus">
+                    <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="form-group" id="divFile">
+            <input type="file" name="txtFile" class="form-control">
+        </div>
+    </form>
+</div>
+
+<div class="row" style="text-align:center;">
+    <button type="button" class="btn btn-success" id="btnSave">Save</button>
+    <button type="button" class="btn btn-warning" id="btnCancle">Cancle</button>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            Page.SelectCategory();
+            $("#btnSave").click(function () {
+                Page.Save();
+            });
+            $("#btnCancle").click(function () {
+                location.href = '@Url.Action("Bom")';
+            });
+            $("#btnPlus").click(function () {
+                Page.ImageButtonClick("A");
+            });
+            $("#btnMinus").click(function () {
+                Page.ImageButtonClick("M");
+            });
+        });
+
+        var Page = {
+            ImageButtonClick : function(type){
+                if (type == "A") {
+                    var html = "<input type=\"file\" name=\"txtFile\" class=\"form-control\">";
+                    $("#divFile").append(html);
+                }
+                else {
+                    var len = $("[name=txtFile]").length;
+                    if (len > 1) {
+                        len = $("[name=txtFile]").eq(len - 1).remove();
+                    }
+                }
+            },
+            Save: function () {
+                $("form").submit();
+            },
+            Del: function () {
+                var data = Utill.Ajax("@Url.Action("BomDelete")", {
+                    id: $("#hidId").val()
+                });
+
+                if (data) {
+                    location.href = "@Url.Action("Bom")";
+                }
+                else {
+                    alert('Fail.......');
+                }
+            },
+            SelectCategory: function () {
+                var data = Utill.Ajax("@Url.Action("GetCategory")");
+                var html = '';
+                $.each(data, function (index, value) {
+                    html += "<option value='" + value.Id.toString() + "'>" + value.name + "</option>";
+                    console.log(value.Id.valueOf());
+                });
+                $("#selCategory").append(html);
+
+            }
+        }
+    </script>
+}

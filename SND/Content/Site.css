@@ -1,0 +1,22 @@
+﻿html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.navbar-static-top {
+  margin-bottom: 19px;
+}
+
+.footer {
+  bottom: 0PX;
+  width: 100%;
+  padding-top:5px;
+  margin-top:10PX;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+}
+

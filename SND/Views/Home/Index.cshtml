@@ -1,0 +1,163 @@
+﻿<div class="row" id="divCategory" style="margin-bottom:20px;"></div>
+
+<div class="row">
+    <div class="col-md-6" id="divProduct">
+        <div class="row">
+            <p>Menu</p>
+            <div class="col-md-6">
+                <p>Original Price</p>
+                <div class="btn-group-vertical" role="group" aria-label="..." id="divPrO"></div>
+            </div>
+            <div class="col-md-6">
+                <p>Sale Price</p>
+                <div class="btn-group-vertical" role="group" aria-label="..." id="divPrS"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6" id="divCal">
+        <div class="row">
+            <p>Order</p>
+            <div class="list-group" id="btnOrder">
+            </div>
+            <p>Total : <span id="sptotal"></span> </p>
+            <div class="btn-group btn-group-lg" role="group" aria-label="Large button group">
+                <button type="button" class="btn btn-default" id="btnCard">Card</button>
+                <button type="button" class="btn btn-default" id="btnCash">Cash</button>
+                <button type="button" class="btn btn-default" id="btnReset">Reset</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="hidId" />
+<input type="hidden" id="hidPrice" />
+<input type="hidden" id="hidType" />
+
+@section scripts{
+    <script type="text/javascript">
+    $(function () {
+        Page.GetCategory();
+        Page.SelectProduct();
+        $("#btnCard").click(function () {
+            Page.Save("C");
+        });
+        $("#btnCash").click(function () {
+            Page.Save("M");
+        });
+    });
+
+    var Page = {
+        GetCategory: function () {
+            var data = Utill.Ajax("@Url.Action("GetCategory", "Pr")");
+            var html = '<div class="btn-group btn-group-justified" role="group" aria-label="btnCategory">';
+            html += '<div class="btn-group" role="group"><button type="button" name="btnCate" class="btn btn-default" onclick="Page.ClickCategory(\'\')">All</button></div>';
+            $.each(data, function (index, value) {
+                html += '<div class="btn-group" role="group"><button type="button" name="btnCate" class="btn btn-default" onclick="Page.ClickCategory(\'' + value.Id.valueOf() + '\')">' + value.name + '</button></div>';
+            });
+            html += "</div>";
+            $("#divCategory").html(html);
+        },
+        ClickCategory: function (id) {
+            Page.SelectProduct(id);
+        },
+        SelectProduct: function (id) {
+            $("#divPrS > button").remove();
+            $("#divPrO > button").remove();
+            var data = Utill.Ajax("@Url.Action("GetProduct")", {id : id});
+            var html = "";
+            var html1 = "";
+            $.each(data, function (index, value) {
+                html += '<button type="button" class="btn btn-default btn-lg btn-block" onclick="Page.ClickProduct(\'' + value.Id.valueOf() + '\',\'' + value.price + '\',\'O\', \'' + value.name + '\')">' + value.name + ' (' + value.price.toLocaleString() + ')</button>';
+            });
+            $.each(data, function (index, value) {
+                html1 += '<button type="button" class="btn btn-default btn-lg btn-block" onclick="Page.ClickProduct(\'' + value.Id.valueOf() + '\',\'' + value.sale + '\',\'S\', \'' + value.name + '\')">' + value.name + ' (' + value.sale.toLocaleString() + ')</button>';
+            });
+            $("#divPrS").append(html);
+            $("#divPrO").append(html1);
+        },
+        ClickProduct: function (id, price, type, name) {
+            var html = '<button type="button" class="list-group-item" onclick="Page.DeleteProduct(\'' + id + '\', \'' + price + '\', \'' + type + '\', \'' + name + '\')">' + name + '(' + price.toLocaleString() + ')' + '</button>';
+            var hid = $("#hidId").val();
+            var hprice = $("#hidPrice").val();
+            var htype = $("#hidType").val();
+            hid += hid == "" ? id : "," + id;
+            hprice += hprice == "" ? price : "," + price;
+            htype += htype == "" ? type : "," + type;
+
+            $("#hidId").val(hid);
+            $("#hidPrice").val(hprice);
+            $("#hidType").val(htype);
+
+            $("#btnOrder").append(html);
+            Page.CalculateTotalPrice();
+        },
+        DeleteProduct: function (id, price, type, name) {
+            //var hid = $("#hidId").val();
+            //var hprice = $("#hidPrice").val();
+            //var htype = $("#hidType").val();
+
+            //var nhid = "";
+            //var nhprice = "";
+            //var nhtype = "";
+
+            //var len = hid.split(',').length;
+            //var arrid = hid.split(',');
+            //var arrprice = hprice.split(',');
+            //var arrtype = htype.split(',');
+            //for (var i = 0; i < len; i++) {
+            //    if (arrid[i] == id && arrprice[i] == price && arrtype[i] == type) {
+
+            //    }
+            //    else {
+            //        nhid += nhid == "" ? arrid[i] : "," + arrid[i];
+            //        nhprice += nhprice == "" ? arrprice[i] : "," + arrprice[i];
+            //        nhtype += nhtype == "" ? arrtype[i] : "," + arrtype[i];
+            //    }
+            //}
+
+            //$("#hidId").val(nhid);
+            //$("#hidPrice").val(nhprice);
+            //$("#hidType").val(nhtype);
+            //Page.CalculateTotalPrice();
+
+            //$("#btnOrder > button").each(function () {
+            //    if ($(this).text() == name + "(" + price + ")") {
+            //        $(this).remove();
+            //        return false;
+            //    }
+            //});
+        },
+        CalculateTotalPrice: function () {
+            var hprice = $("#hidPrice").val();
+            var arrprice = hprice.split(',');
+            var len = hprice.split(',').length;
+            var total = 0;
+            for (var i = 0; i < len; i++) {
+                total += Number(arrprice[i]);
+            }
+            $("#sptotal").text(total.toLocaleString());
+        },
+        Reset: function () {
+            $("#hidId").val('');
+            $("#hidPrice").val('');
+            $("#hidType").val('');
+            $("#btnOrder > button").remove();
+            Page.CalculateTotalPrice();
+        },
+        Save: function (type) {
+            var hid = $("#hidId").val();
+            var hprice = $("#hidPrice").val();
+            var htype = $("#hidType").val();
+
+            var data = Utill.Ajax("@Url.Action("Save")", { id: hid, price: hprice, type: htype, pay: type });
+            if(data == true)
+            {
+                Page.Reset();
+            }
+            else {
+                alert('Fail..');
+            }
+        }
+    }
+    </script>
+}

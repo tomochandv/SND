@@ -1,0 +1,102 @@
+﻿@model List<SND.Models.BomModel>
+
+<div class="row">
+    <h3>Bom</h3>
+</div>
+
+<div class="row">
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th style="vertical-align:middle;">Category</th>
+                <td>
+                    <select id="selCategory" class="form-control">
+                        <option value="">All</option>
+                    </select>
+                </td>
+                <td style="vertical-align:middle;">
+                    <button type="button" class="btn btn-info btn-sm" id="btnSearch">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        Search
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="row" style="text-align:right; margin-bottom:10px;">
+    <button type="button" class="btn btn-primary btn-sm" id="btnCreate">
+        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+        Add
+    </button>
+</div>
+<div class="row">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="text-align:center;">Bom Category</th>
+                <th style="text-align:center;">Bom Name</th>
+                <th style="text-align:center;">Bom Unit</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="tbody1">
+            @foreach (var data in Model)
+            {
+                <tr>
+                    <td>@data.BomCategory.BomCategoryName</td>
+                    <td>@data.BomName</td>
+                    <td>@data.Unit</td>
+                    <td style="text-align:center;">
+                        <button name="btnDelete" type="button" class="btn btn-danger  btn-xs" role="@data.Id">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+    $(function () {
+        Page.SelectCategory();
+        Page.Load();
+        $("#btnCreate").click(function () {
+            location.href = '@Url.Action("BomSave")';
+        });
+        $("#btnSearch").click(function () {
+            Page.Search();
+        });
+        $("[name='btnDelete']").click(function () {
+            Page.Delete($(this).attr("role"));
+        });
+    });
+    var Page = {
+        SelectCategory: function () {
+            var data = Utill.Ajax("@Url.Action("GetCategory")");
+                var html = '';
+                $.each(data, function (index, value) {
+                    html += "<option value='" + value.Id.toString() + "'>" + value.BomCategoryName + "</option>";
+                    console.log(value.Id.valueOf());
+                });
+                $("#selCategory").append(html);
+
+        },
+        Search: function () {
+            var url = "@Url.Action("Bom")?id=" + $("#selCategory").val();
+            location.href = url;
+        },
+        Load: function () {
+            $("#selCategory").val('@ViewBag.id');
+        },
+        Delete: function (id) {
+            var data = Utill.Ajax("@Url.Action("BomDelete")", { id: id });
+            if (data) {
+                location.href = '@Url.Action("Bom")';
+            }
+        }
+    }
+    </script>
+}

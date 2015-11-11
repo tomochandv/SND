@@ -1,0 +1,66 @@
+﻿@model List<SND.Models.BomCategoryModel>
+
+<div class="row">
+    <h3>Bom category</h3>
+</div>
+<div class="row" style="text-align:right; margin-bottom:10px;">
+    <button type="button" class="btn btn-primary btn-sm" id="btnCreate">
+        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+        Add
+    </button>
+</div>
+<div class="row">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="text-align:center; width:75%">Name</th>
+                <th style="text-align:center; width:10%">Bom Count</th>
+                <th style="text-align:center; width:5%"></th>
+            </tr>
+        </thead>
+        <tbody id="tbody1">
+            @foreach (var data in Model)
+            {
+                <tr>
+                    <td>@data.BomCategoryName</td>
+                    <td style="text-align:center;">
+                        <span name="count" role="@data.Id"></span>
+                    </td>
+                    <td style="text-align:center;">
+                        <button name="btnDelete" type="button" class="btn btn-danger  btn-xs" role="@data.Id">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+    $(function () {
+        $("#btnCreate").click(function () {
+            location.href = "/Bom/Save";
+        });
+        Page.GetCount();
+        $("[name='btnDelete']").click(function () {
+            Page.Delete($(this).attr("role"));
+        });
+    });
+    var Page = {
+        GetCount: function () {
+        $("[name='count']").each(function (index, value) {
+            var data = Utill.Ajax("@Url.Action("BomCount")", { id: $(this).attr("role") });
+                $(this).text(data);
+            });
+        },
+        Delete: function (id) {
+            var data = Utill.Ajax("@Url.Action("CategoryDelete")", { id: id });
+            if (data) {
+                location.href = '@Url.Action("Category")';
+            }
+        }
+    }
+    </script>
+}

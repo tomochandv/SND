@@ -1,0 +1,96 @@
+﻿@model List<SND.Models.ProductModel>
+
+<div class="row">
+    <h3>Product</h3>
+</div>
+
+<div class="row">
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th style="vertical-align:middle;">Category</th>
+                <td>
+                    <select id="selCategory" class="form-control">
+                        <option value="">All</option>
+                    </select>
+                </td>
+                <td style="vertical-align:middle;">
+                    <button type="button" class="btn btn-info btn-sm" id="btnSearch">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        Search
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="row" style="text-align:right; margin-bottom:10px;">
+    <button type="button" class="btn btn-primary btn-sm" id="btnCreate">
+        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+        Add
+    </button>
+</div>
+<div class="row">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="text-align:center;">Category</th>
+                <th style="text-align:center;">Name</th>
+                <th style="text-align:center;">Price</th>
+                <th style="text-align:center;">Sale Price</th>
+                <th style="text-align:center;">Desc.</th>
+                <th>Use</th>
+            </tr>
+        </thead>
+        <tbody id="tbody1">
+            @foreach (var data in Model)
+            {
+                <tr>
+                    <td>@data.ProductCategory.ProductCategoryNm</td>
+                    <td><a href="@Url.Action("Views")?id=@data.Id">@data.ProductNm</a></td>
+                    <td style="text-align:right;">@string.Format("{0:###,###}", data.Price)</td>
+                    <td style="text-align:right;">@string.Format("{0:###,###}", data.PriceSale)</td>
+                    <td>@data.Description</td>
+                    <td>@data.UseYn</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+    $(function () {
+        Page.SelectCategory();
+        Page.Load();
+        $("#btnCreate").click(function () {
+            location.href = '@Url.Action("ProductSave")';
+        });
+        $("#btnSearch").click(function () {
+            Page.Search();
+        });
+        $("[name='btnDelete']").click(function () {
+            Page.Delete($(this).attr("role"));
+        });
+    });
+    var Page = {
+        SelectCategory: function () {
+            var data = Utill.Ajax("@Url.Action("GetCategory")");
+                var html = '';
+                $.each(data, function (index, value) {
+                    html += "<option value='" + value.Id.toString() + "'>" + value.name + "</option>";
+                    console.log(value.Id.valueOf());
+                });
+                $("#selCategory").append(html);
+
+        },
+        Search: function () {
+            var url = "@Url.Action("Product")?id=" + $("#selCategory").val();
+            location.href = url;
+        },
+        Load: function () {
+            $("#selCategory").val('@ViewBag.id');
+        }
+    }
+    </script>
+}

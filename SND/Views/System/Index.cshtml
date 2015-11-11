@@ -1,0 +1,108 @@
+﻿@model List<SND.Models.LoginModel>
+
+<div class="row">
+    <h3>User</h3>
+</div>
+
+<div class="row">
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th style="vertical-align:middle;">Company</th>
+                <td>
+                    <select id="selcom" class="form-control">
+                        <option value="">All</option>
+                    </select>
+                </td>
+                <td style="vertical-align:middle;">
+                    <button type="button" class="btn btn-info btn-sm" id="btnSearch">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        Search
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="row" style="text-align:right; margin-bottom:10px;">
+    <button type="button" class="btn btn-primary btn-sm" id="btnCreate">
+        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+        Add
+    </button>
+</div>
+
+<div class="row">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="text-align:center;">Name</th>
+                <th style="text-align:center;">Tell</th>
+                <th style="text-align:center;">Email</th>
+                <th style="text-align:center;">Company</th>
+                <th style="text-align:center;">Grade</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="tbody1">
+            @foreach (var data in Model)
+            {
+                <tr>
+                    <td>@data.name</td>
+                    <td>@data.tell</td>
+                    <td>@data.email</td>
+                    <td>@data.company.ComName</td>
+                    <td>@data.grade</td>
+                    <td style="text-align:center;">
+                        <button name="btnDelete" type="button" class="btn btn-danger  btn-xs" role="@data.Id">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+    $(function () {
+        Page.SelectCompany();
+        Page.Load();
+        $("#btnCreate").click(function () {
+            location.href = '@Url.Action("UserSave")';
+        });
+        $("#btnSearch").click(function () {
+            Page.Search();
+        });
+        $("[name='btnDelete']").click(function () {
+            Page.Delete($(this).attr("role"));
+        });
+    });
+    var Page = {
+        SelectCompany: function () {
+            var data = Utill.Ajax("@Url.Action("GetCompany")");
+                var html = '';
+                $.each(data, function (index, value) {
+                    html += "<option value='" + value.Id.toString() + "'>" + value.Name + "</option>";
+                    console.log(value.Id.valueOf());
+                });
+                $("#selcom").append(html);
+
+        },
+        Search: function () {
+            var url = "@Url.Action("Index")?id=" + $("#selcom").val();
+            location.href = url;
+        },
+        Load: function () {
+            $("#selcom").val('@ViewBag.id');
+        },
+        Delete: function (id) {
+            var data = Utill.Ajax("@Url.Action("UserDelete")", { id: id });
+            if (data) {
+                location.href = '@Url.Action("Index")';
+            }
+        }
+    }
+    </script>
+}

@@ -1,0 +1,180 @@
+﻿@model List<SND.Models.BomSellModel>
+
+<div class="row">
+    <h3>Bom Sell</h3>
+</div>
+
+<div class="row">
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th style="vertical-align:middle; width:20%;">Category</th>
+                <td style="width:20%;">
+                    <select id="selCategory" class="form-control">
+                        <option value="">All</option>
+                    </select>
+                </td>
+                <th style="vertical-align:middle;width:20%;">Bom</th>
+                <td style="width:30%;">
+                    <select id="selBom" class="form-control">
+                        <option value="">All</option>
+                    </select>
+                </td>
+                <td style="vertical-align:middle; text-align:center;" rowspan="3">
+                    <button type="button" class="btn btn-info btn-sm" id="btnSearch">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        Search
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <th style="vertical-align:middle;">OutCompany</th>
+                <td>
+                    <select id="selOut" class="form-control">
+                        <option value="">All</option>
+                    </select>
+                </td>
+                <th style="vertical-align:middle;">Date</th>
+                <td>
+                    <input type="datetime" id="txtsdate" class="form-control" value="@DateTime.Now.ToShortDateString()" style="width:40%; display:inline;" /> ~
+                    <input type="datetime" id="txtedate" class="form-control" value="@DateTime.Now.ToShortDateString()" style="width:40%; display:inline;" /> 
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>
+
+<div class="row" style="text-align:right; margin-bottom:10px;">
+    <button type="button" class="btn btn-primary btn-sm" id="btnCreate">
+        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+        Add
+    </button>
+</div>
+
+<div class="row">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="text-align:center;">Category</th>
+                <th style="text-align:center;">Bom Name</th>
+                <th style="text-align:center;">Out Name</th>
+                <th style="text-align:center;">Price</th>
+                <th style="text-align:center;">Qty</th>
+                <th style="text-align:center;">Total</th>
+                <th style="text-align:center;">Date</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="tbody1">
+            @{int toTalPrice = 0; int totalQty = 0; int Total = 0;}
+            @foreach (var data in Model)
+            {
+                <tr>
+                    <td>@data.Bom.BomCategory.BomCategoryName</td>
+                    <td>@data.Bom.BomName</td>
+                    <td>@data.OutCompany.OutComName</td>
+                    <td style="text-align:right;">@string.Format("{0:###,###}", data.Price)</td>
+                    <td style="text-align:right;">@string.Format("{0:###,###} {1}", data.Qty, data.Bom.Unit)</td>
+                    <td style="text-align:right;">@string.Format("{0:###,###}", data.TotalPrice)</td>
+                    <td style="text-align:center;">@data.Indate.ToString("yyyy-MM-dd")</td>
+                    <td style="text-align:center;">
+                        <button name="btnDelete" type="button" class="btn btn-danger  btn-xs" role="@data.Id">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                </tr>
+                toTalPrice += data.Price;
+                totalQty += data.Qty;
+                Total += data.TotalPrice;
+            }
+            <tr>
+                <td colspan="3">Total</td>
+                <td style="text-align:right;">@string.Format("{0:###,###}", toTalPrice)</td>
+                <td style="text-align:right;">@string.Format("{0:###,###}", totalQty)</td>
+                <td style="text-align:right;">@string.Format("{0:###,###}", Total)</td>
+                <td colspan="2">&nbsp;</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+    $(function () {
+        Page.SelectCategory();
+        Page.SelectBom();
+        Page.SelctOutcompany();
+        Page.Load();
+        $("#btnCreate").click(function () {
+            location.href = '@Url.Action("BomSellSave")';
+        });
+        $("#btnSearch").click(function () {
+            Page.Search();
+        });
+        $("[name='btnDelete']").click(function () {
+            Page.Delete($(this).attr("role"));
+        });
+        $("#selCategory").change(function () {
+            Page.SelectBom();
+        });
+    });
+    var Page = {
+        SelectCategory: function () {
+            var data = Utill.Ajax("@Url.Action("GetCategory")");
+            var html = '';
+            $.each(data, function (index, value) {
+                html += "<option value='" + value.Id.toString() + "'>" + value.BomCategoryName + "</option>";
+                console.log(value.Id.valueOf());
+            });
+            $("#selCategory").append(html);
+            $("#selCategory").val('@ViewBag.catid');
+
+        },
+        SelectBom: function () {
+            var catid = $("#selCategory").val();
+            if (catid != "") {
+                var data = Utill.Ajax("@Url.Action("GetBomList")", { catid: $("#selCategory").val() });
+                var html = '<option value="">All</option>';
+                $.each(data, function (index, value) {
+                    html += "<option value='" + value.Id.toString() + "'>" + value.BomName + "</option>";
+                    console.log(value.Id.valueOf());
+                });
+                $("#selBom > option").remove();
+                $("#selBom").append(html);
+                $("#selBom").val('@ViewBag.bomId');
+            }
+
+        },
+        SelctOutcompany: function () {
+            var data = Utill.Ajax("@Url.Action("GetOutCompany")");
+            var html = '';
+            $.each(data, function (index, value) {
+                html += "<option value='" + value.Id.toString() + "'>" + value.OutComName + "</option>";
+                console.log(value.Id.valueOf());
+            });
+            $("#selOut").append(html);
+        },
+        Search: function () {
+            var url = "@Url.Action("BomSell")";
+            url += "?catid=" + $("#selCategory").val();
+            url += "&bomId=" + $("#selBom").val();
+            url += "&outId=" + $("#selOut").val();
+            url += "&sdate=" + $("#txtsdate").val();
+            url += "&edate=" + $("#txtedate").val();
+            location.href = url;
+        },
+        Load: function () {
+            $("#selOut").val('@ViewBag.outId');
+            $("#txtsdate").val('@ViewBag.sdate');
+            $("#txtedate").val('@ViewBag.edate');
+        },
+        Delete: function (id) {
+            var data = Utill.Ajax("@Url.Action("BomSellDelete")", { id: id });
+            if (data) {
+                location.href = '@Url.Action("BomSell")';
+            }
+        }
+    }
+</script>
+}
