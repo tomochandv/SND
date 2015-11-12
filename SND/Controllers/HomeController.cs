@@ -49,8 +49,8 @@ namespace SND.Controllers
             {
                 if (id != "")
                 {
-                    string orderNo = DateTime.Now.ToString("yyyyMMddHHmmss");
-                    DateTime now = DateTime.Now;
+                    string orderNo = DateTime.Now.AddMonths(-1).ToString("yyyyMMddHHmmss");
+                    DateTime now = DateTime.Now.AddMonths(-1);
                     string[] arrId = id.Split(',');
                     string[] arrPrice = price.Split(',');
                     string[] arrType = type.Split(',');
