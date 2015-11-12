@@ -1,0 +1,59 @@
+﻿@model List<SND.Models.StaticsModel>
+
+<div class="row">
+    <h3>Price Year Statics</h3>
+</div>
+
+<div class="row">
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th style="vertical-align:middle;">Date</th>
+                <td>
+                    <input type="number" id="txtYear" class="form-control" value="@ViewBag.yyyy" style="width:40%; display:inline;" />
+                </td>
+                <td style="vertical-align:middle; text-align:center;">
+                    <button type="button" class="btn btn-info btn-sm" id="btnSearch">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        Search
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="row">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                @foreach (var month in Model)
+                {
+                    <th style="text-align:center; width:8.3%" colspan="2">@month.mm</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                @{int count = 0; int total = 0;}
+                @foreach(var data in Model)
+                {
+                    count += data.count;
+                    total += data.price;
+                    <td>@string.Format("{0:###,###}", data.price)</td>
+                    <td>@string.Format("{0:###,###}", data.count)</td>
+                }
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr class="success">
+                <td colspan="6">Total Count</td>
+                <td colspan="6" style="text-align:right;">@string.Format("{0:###,###}", count)</td>
+                <td colspan="6">Total Price </td>
+                <td colspan="6" style="text-align:right;">
+                    @string.Format("{0:###,###}", total)
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

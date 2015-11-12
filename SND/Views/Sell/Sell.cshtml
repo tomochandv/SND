@@ -92,11 +92,14 @@
         <script type="text/javascript">
             $(function () {
                 Page.Load();
+                $("#btnSearch").click(function () {
+                    Page.Search();
+                });
             });
 
             var Page = {
                 Search: function () {
-                    var url = "@Url.Action("Index")";
+                    var url = "@Url.Action("Sell")";
                     url += "?sdate=" + $("#txtsdate").val();
                     url += "&edate=" + $("#txtedate").val();
                     location.href = url;
@@ -112,8 +115,8 @@
                         table += "<tr>";
                         table += "<td>" + value.category + "</td>";
                         table += "<td>" + value.name + "</td>";
-                        table += "<td>" + value.price.toLocaleString() + "</td>";
-                        table += "<td>" + value.sale + "</td>";
+                        table += "<td style='text-align:right;'>" + value.price.toLocaleString() + "</td>";
+                        table += "<td style='text-align:center;'>" + value.sale + "</td>";
                         table += "</tr>";
                     });
                     $("#tbody1").append(table);

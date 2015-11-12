@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using MongoDB.Bson;
 using SND.Dac;
@@ -54,7 +53,7 @@ namespace SND.Controllers
                            name = e.Product.ProductNm,
                            price = e.Price,
                            category = e.Product.ProductCategory.ProductCategoryNm,
-                           sale = e.DiscountYn == "Y"
+                           sale = e.DiscountYn == "O" ? "N" : "Y"
                        };
             data.OrderByDescending(x => x.category);
             return Json(data);
