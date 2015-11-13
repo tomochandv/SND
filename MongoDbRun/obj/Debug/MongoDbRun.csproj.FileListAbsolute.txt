@@ -1,0 +1,9 @@
+D:\SND\MongoDbRun\bin\Debug\MongoDbRun.exe.config
+D:\SND\MongoDbRun\bin\Debug\MongoDbRun.exe
+D:\SND\MongoDbRun\bin\Debug\MongoDbRun.pdb
+D:\SND\MongoDbRun\obj\Debug\MongoDbRun.csprojResolveAssemblyReference.cache
+D:\SND\MongoDbRun\obj\Debug\MongoDbRun.Form1.resources
+D:\SND\MongoDbRun\obj\Debug\MongoDbRun.Properties.Resources.resources
+D:\SND\MongoDbRun\obj\Debug\MongoDbRun.csproj.GenerateResource.Cache
+D:\SND\MongoDbRun\obj\Debug\MongoDbRun.exe
+D:\SND\MongoDbRun\obj\Debug\MongoDbRun.pdb

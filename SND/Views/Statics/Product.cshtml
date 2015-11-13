@@ -1,0 +1,67 @@
+﻿@section topScripts{
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+}
+@model List<SND.Models.StaticProductMasterModel>
+
+<div class="row">
+    <h3>Price Year Statics</h3>
+</div>
+
+<div class="row">
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th style="vertical-align:middle;">Date</th>
+                <td>
+                    <input type="number" id="txtYear" class="form-control" value="@ViewBag.yyyy" style="width:40%; display:inline;" />
+                </td>
+                <td style="vertical-align:middle; text-align:center;">
+                    <button type="button" class="btn btn-info btn-sm" id="btnSearch">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        Search
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="row">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                @foreach (var month in Model)
+                {
+                    <th style="text-align:center; width:7.7%" colspan="2">@month.mm</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+              @if(Model.Count > 0)
+              {
+                  foreach(var data in Model[0].ProductList)
+                  {
+                      <tr>
+                          <td>@data.productName</td>
+                          @foreach(var detail in Model)
+                          {
+                              foreach(var detail1 in detail.ProductList)
+                              {
+                                if(data.Id == detail1.Id)
+                                {
+                                    <td>@detail1.price</td>
+                                    <td>@detail1.qty</td>
+                                }
+                              }
+                          }
+                      </tr>
+                  }
+              }
+        </tbody>
+    </table>
+</div>
+
+<div class="row">
+    <div id="chart_div"></div>
+</div>

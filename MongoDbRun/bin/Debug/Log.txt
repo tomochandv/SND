@@ -1,0 +1,6 @@
+ECHO가 설정되어 있습니다.
+
+D:\SND\MongoDbRun\bin\Debug>cd C:\Program Files\MongoDB\Server\3.0\bin 
+
+D:\SND\MongoDbRun\bin\Debug>mongod --auth --dbpath D:\DB 
+

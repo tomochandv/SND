@@ -274,6 +274,7 @@
     <Content Include="Views\Sell\Index.cshtml" />
     <Content Include="Views\Sell\Sell.cshtml" />
     <Content Include="Views\Statics\Price.cshtml" />
+    <Content Include="Views\Statics\Product.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
