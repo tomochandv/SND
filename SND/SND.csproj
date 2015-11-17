@@ -215,6 +215,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
+    <Content Include="robots.txt" />
     <Content Include="Scripts\chartist.min.js" />
     <Content Include="Scripts\numeric.js" />
     <Content Include="Views\Company\Index.cshtml" />
@@ -275,6 +276,7 @@
     <Content Include="Views\Sell\Sell.cshtml" />
     <Content Include="Views\Statics\Price.cshtml" />
     <Content Include="Views\Statics\Product.cshtml" />
+    <Content Include="Views\Statics\DailyPrice.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

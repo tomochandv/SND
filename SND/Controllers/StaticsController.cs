@@ -117,10 +117,49 @@ namespace SND.Controllers
             return View(modelList);
         }
 
-        public ActionResult Category()
+        public ActionResult DailyPrice(string yyyy = "", string mm = "")
         {
-            return View();
+            List<StaticsDailyPrice> model = new List<StaticsDailyPrice>();
+            yyyy = yyyy == "" ? DateTime.Now.Year.ToString() : yyyy;
+            mm = mm == "" ? (DateTime.Now.Month.ToString().Length == 1 ? "0" + DateTime.Now.Month.ToString() : DateTime.Now.Month.ToString()) : mm;
+            ViewBag.yyyy = yyyy;
+            ViewBag.mm = mm;
+            DateTime date = new DateTime(WebUtill.ConvertInt(yyyy), WebUtill.ConvertInt(mm), 1);
+
+            DateTime sdate = DateTime.Parse(yyyy + "-" + mm + "-01 00:00:00");
+            DateTime edate = DateTime.Parse(sdate.AddMonths(1).AddDays(-1).ToShortDateString() + " 23:59:59");
+
+            List<ProductSellModel> sellModel = new Dac_Product().ProductSellSelect(
+               "", "",
+                sdate,
+                edate
+                ).ToList();
+
+            int totalDate = DateTime.DaysInMonth(WebUtill.ConvertInt(yyyy), WebUtill.ConvertInt(mm));
+            for (int i = 1; i <= totalDate; i++ )
+            {
+                StaticsDailyPrice data = new StaticsDailyPrice();
+                DateTime dateValue = new DateTime(WebUtill.ConvertInt(yyyy), WebUtill.ConvertInt(mm), i);
+                data.yyyy = yyyy;
+                data.mm = mm;
+                data.dd = dateValue.ToString("dd");
+                data.weekend = dateValue.ToString("ddd");
+                var sellModelData = sellModel.Where(x => x.Indate.ToString("yyyyMMdd") == dateValue.ToString("yyyyMMdd"));
+                int count = 0;
+                int totalPrice = 0;
+                foreach(var datas in sellModelData)
+                {
+                    count++;
+                    totalPrice += datas.Price;
+                }
+                data.price = totalPrice;
+                data.count = count;
+                model.Add(data);
+            }
+            return View(model);
         }
+
+
 
        
 

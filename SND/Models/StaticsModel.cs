@@ -28,4 +28,14 @@ namespace SND.Models
         public int qty { get; set; }
         public int price { get; set; }
     }
+
+    public class StaticsDailyPrice
+    {
+        public string yyyy { get; set; }
+        public string mm { get; set; }
+        public string dd { get; set; }
+        public string weekend { get; set; }
+        public int price { get; set; }
+        public int count { get; set; }
+    }
 }

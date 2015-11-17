@@ -90,7 +90,7 @@ namespace SND.Controllers
         {
             return View();
         }
-        public RedirectResult ProductInsert(string selCategory = "", string txtName = "", int txtPrice = 0, int txtSalePrice = 0, string txtDesc = "")
+        public RedirectResult ProductInsert(string selCategory = "", string txtName = "", int txtPrice = 0, int txtSalePrice = 0, string txtDesc = "", string txtBom = "")
         {
             HttpFileCollectionBase files = Request.Files;
             List<string> img = new List<string>();
@@ -103,7 +103,7 @@ namespace SND.Controllers
             model.PriceSale = txtSalePrice;
             model.ProductNm = txtName;
             model.ProductCategory = category;
-
+            model.Bom = txtBom;
             if (files.Count > 0)
             {
                 string path = Server.MapPath("/Upload/");
@@ -120,7 +120,7 @@ namespace SND.Controllers
             return Redirect("/Pr/Product");
         }
 
-        public RedirectResult ProductUpdate(string id = "", string selCategory = "", string txtName = "", int txtPrice = 0, int txtSalePrice = 0, string txtDesc = "", string selUse = "")
+        public RedirectResult ProductUpdate(string id = "", string selCategory = "", string txtName = "", int txtPrice = 0, int txtSalePrice = 0, string txtDesc = "", string selUse = "", string txtBom = "")
         {
             ProductModel product = new Dac_Product().ProductView(ObjectId.Parse(id));
             HttpFileCollectionBase files = Request.Files;
@@ -136,7 +136,7 @@ namespace SND.Controllers
             model.ProductNm = txtName;
             model.ProductCategory = category;
             model.UseYn = selUse == "0" ? true : false;
-
+            model.Bom = txtBom;
             if (files.Count > 0)
             {
                 string path = Server.MapPath("/Upload/");

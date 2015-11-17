@@ -1,0 +1,60 @@
+﻿@model List<SND.Models.StaticsDailyPrice>
+@{int rowCount = Model.Count / 7;
+  int add = Model.Count % 7 == 0 ? 0 : 1;
+  int rows = rowCount + add;}
+<div class="row">
+    <h3>Daily Statics</h3>
+</div>
+
+<div class="row">
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th style="vertical-align:middle;">Date</th>
+                <td>
+                    <select id="selYY" class="form-control">
+                        @for (int i = DateTime.Now.AddYears(-5).Year; i <= DateTime.Now.Year; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                    <select id="selMM" class="form-control">
+                        @for (int i = 1; i < 13; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </td>
+                <td style="vertical-align:middle; text-align:center;">
+                    <button type="button" class="btn btn-info btn-sm" id="btnSearch">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        Search
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<div class="row">
+    <dl class="dl-horizontal">
+       @foreach(var data in Model)
+       {
+           <dt>@string.Format("{0}-{1}-{2} ({3})", data.yyyy, data.mm, data.dd, data.weekend)</dt>
+           <dd>@data.count / @data.price </dd>
+       }
+    </dl>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+    $(function () {
+        $("#btnSearch").click(function () {
+            location.href = "@Url.Action("DailyPrice")?yyyy=" + $("#selYY").val() + "&mm=" + $("#selMM").val();
+        });
+        $("#selYY").val('@ViewBag.yyyy');
+            $("#selMM").val('@ViewBag.mm');
+        });
+    </script>
+}
