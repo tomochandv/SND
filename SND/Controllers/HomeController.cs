@@ -41,22 +41,21 @@ namespace SND.Controllers
             return Json(data);
         }
 
-        public JsonResult Save(string id = "", string price = "", string type = "", string pay = "")
+        public JsonResult Save(List<string> id, List<string> price, List<string> qty, string pay)
         {
             bool result = false;
             try
             {
-                if (id != "")
+
+                if (id.Count > 0)
                 {
                     string orderNo = DateTime.Now.AddMonths(-1).ToString("yyyyMMddHHmmss");
-                    DateTime now = DateTime.Now.AddMonths(-1);
-                    string[] arrId = id.Split(',');
-                    string[] arrPrice = price.Split(',');
-                    string[] arrType = type.Split(',');
+                    DateTime now = DateTime.Now;
+
                     int total = 0;
-                    for (int i = 0; i < arrId.Length; i++)
+                    for (int i = 0; i < id.Count; i++)
                     {
-                        total += WebUtill.ConvertInt(arrPrice[i]);
+                        total += WebUtill.ConvertInt(price[i]) * WebUtill.ConvertInt(qty[i]);
                     }
 
                     ProductSellMasterModel master = new ProductSellMasterModel();
@@ -66,18 +65,22 @@ namespace SND.Controllers
                     master.PayType = pay;
                     master.TotalPrice = total;
                     new Dac_Product().ProductSellMasterSave(master);
-                    for (int i = 0; i < arrId.Length; i++)
+
+                    for (int i = 0; i < id.Count; i++)
                     {
-                        ProductSellModel data = new ProductSellModel();
-                        data.OrderNo = orderNo; 
-                        data.Product = new Dac_Product().ProductView(ObjectId.Parse(arrId[i]));
-                        data.Price = WebUtill.ConvertInt(arrPrice[i]);
-                        data.DiscountYn = arrType[i];
-                        data.PayType = pay;
-                        data.Indate = DateTime.Now;
-                        data.TotalPrice = total;
-                        new Dac_Product().ProductSellSave(data);
-                        result = true;
+                        for(int j=0; j < WebUtill.ConvertInt(qty[i]); j++)
+                        {
+                            ProductSellModel data = new ProductSellModel();
+                            data.OrderNo = orderNo;
+                            data.Product = new Dac_Product().ProductView(ObjectId.Parse(id[i]));
+                            data.Price = WebUtill.ConvertInt(price[i]);
+                            data.DiscountYn = "O";
+                            data.PayType = pay;
+                            data.Indate = now;
+                            data.TotalPrice = total;
+                            new Dac_Product().ProductSellSave(data);
+                            result = true;
+                        }
                     }
                 }
                 else

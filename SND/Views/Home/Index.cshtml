@@ -3,35 +3,58 @@
 <div class="row">
     <div class="col-md-6" id="divProduct">
         <div class="row">
-            <p>Menu</p>
-            <div class="col-md-6">
-                <p>Original Price</p>
-                <div class="btn-group-vertical" role="group" aria-label="..." id="divPrO"></div>
-            </div>
-            <div class="col-md-6">
-                <p>Sale Price</p>
-                <div class="btn-group-vertical" role="group" aria-label="..." id="divPrS"></div>
+            <div class="panel panel-success">
+                <div class="panel-heading" style="text-align:center;">
+                    <h4>Menu</h4>
+                </div>
+                <div class="panel-body">
+                    <div class="btn-group-vertical" role="group" aria-label="..." id="divPrO"></div>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-md-6" id="divCal">
         <div class="row">
-            <p>Order</p>
-            <div class="list-group" id="btnOrder">
+            <div class="panel panel-success">
+                <div class="panel-heading" style="text-align:center;">
+                    <h4>Order</h4>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="text-align:center; width:40%">Name</th>
+                                <th style="text-align:center; width:40%">Price</th>
+                                <th style="text-align:center; width:20%">Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody1"></tbody>
+                    </table>
+                    <div class="list-group" id="btnOrder">
+                    </div>
+                </div>
             </div>
+        </div>
+    </div>
+</div>
+<div class="row" id="divCal" style="margin-top:10px;">
+    <div class="panel panel-info">
+        <div class="panel-heading">
             <p>Total : <span id="sptotal"></span> </p>
+        </div>
+        <div class="panel-body" style="text-align:center;">
             <div class="btn-group btn-group-lg" role="group" aria-label="Large button group">
                 <button type="button" class="btn btn-default" id="btnCard">Card</button>
                 <button type="button" class="btn btn-default" id="btnCash">Cash</button>
                 <button type="button" class="btn btn-default" id="btnReset">Reset</button>
             </div>
         </div>
+        
     </div>
+    
+    
 </div>
 
-<input type="hidden" id="hidId" />
-<input type="hidden" id="hidPrice" />
-<input type="hidden" id="hidType" />
 
 @section scripts{
     <script type="text/javascript">
@@ -44,6 +67,7 @@
         $("#btnCash").click(function () {
             Page.Save("M");
         });
+        
     });
 
     var Page = {
@@ -61,103 +85,88 @@
             Page.SelectProduct(id);
         },
         SelectProduct: function (id) {
-            $("#divPrS > button").remove();
             $("#divPrO > button").remove();
             var data = Utill.Ajax("@Url.Action("GetProduct")", {id : id});
-            var html = "";
             var html1 = "";
-            $.each(data, function (index, value) {
-                html += '<button type="button" class="btn btn-default btn-lg btn-block" onclick="Page.ClickProduct(\'' + value.Id.valueOf() + '\',\'' + value.price + '\',\'O\', \'' + value.name + '\')">' + value.name + ' (' + value.price.toLocaleString() + ')</button>';
-            });
             $.each(data, function (index, value) {
                 html1 += '<button type="button" class="btn btn-default btn-lg btn-block" onclick="Page.ClickProduct(\'' + value.Id.valueOf() + '\',\'' + value.sale + '\',\'S\', \'' + value.name + '\')">' + value.name + ' (' + value.sale.toLocaleString() + ')</button>';
             });
-            $("#divPrS").append(html);
             $("#divPrO").append(html1);
         },
         ClickProduct: function (id, price, type, name) {
-            var html = '<button type="button" class="list-group-item" onclick="Page.DeleteProduct(\'' + id + '\', \'' + price + '\', \'' + type + '\', \'' + name + '\')">' + name + '(' + price.toLocaleString() + ')' + '</button>';
-            var hid = $("#hidId").val();
-            var hprice = $("#hidPrice").val();
-            var htype = $("#hidType").val();
-            hid += hid == "" ? id : "," + id;
-            hprice += hprice == "" ? price : "," + price;
-            htype += htype == "" ? type : "," + type;
+            var html = "";
+            //이미 선택한 상품인지 아닌지
+            var lengthProduct = $("#hid_" + id).length;
+            if (lengthProduct > 0) {
+                $("#hid_" + id).val(Number($("#hid_" + id).val()) + 1);
+            }
+            else {
+                html += "<tr>";
+                html += "<td>" + name + "</td>";
+                html += "<td>";
+                html += ' <input class="form-control" style="display:inline;" type="number" name="nQty" onkeypress="Page.CalculateTotalPrice();" onchange="Page.CalculateTotalPrice();" id="hid_price_' + id + '" value="' + price + '"> </button>';
+                html += "</td>"
+                html += "<td>";
+                html += '<input class="form-control" style="display:inline;" type="number" name="nPrice" onkeypress="Page.CalculateTotalPrice();" onchange="Page.CalculateTotalPrice();" id="hid_' + id + '" value="1">';
+                html += "</td>"
+                html += "</tr>";
+            }
 
-            $("#hidId").val(hid);
-            $("#hidPrice").val(hprice);
-            $("#hidType").val(htype);
-
-            $("#btnOrder").append(html);
+            $("#tbody1").append(html);
             Page.CalculateTotalPrice();
         },
-        DeleteProduct: function (id, price, type, name) {
-            //var hid = $("#hidId").val();
-            //var hprice = $("#hidPrice").val();
-            //var htype = $("#hidType").val();
-
-            //var nhid = "";
-            //var nhprice = "";
-            //var nhtype = "";
-
-            //var len = hid.split(',').length;
-            //var arrid = hid.split(',');
-            //var arrprice = hprice.split(',');
-            //var arrtype = htype.split(',');
-            //for (var i = 0; i < len; i++) {
-            //    if (arrid[i] == id && arrprice[i] == price && arrtype[i] == type) {
-
-            //    }
-            //    else {
-            //        nhid += nhid == "" ? arrid[i] : "," + arrid[i];
-            //        nhprice += nhprice == "" ? arrprice[i] : "," + arrprice[i];
-            //        nhtype += nhtype == "" ? arrtype[i] : "," + arrtype[i];
-            //    }
-            //}
-
-            //$("#hidId").val(nhid);
-            //$("#hidPrice").val(nhprice);
-            //$("#hidType").val(nhtype);
-            //Page.CalculateTotalPrice();
-
-            //$("#btnOrder > button").each(function () {
-            //    if ($(this).text() == name + "(" + price + ")") {
-            //        $(this).remove();
-            //        return false;
-            //    }
-            //});
-        },
         CalculateTotalPrice: function () {
-            var hprice = $("#hidPrice").val();
-            var arrprice = hprice.split(',');
-            var len = hprice.split(',').length;
+            var arrQty = $("[name=nQty]").length;
+            var arrNprice = $("[name=nPrice]").length;
             var total = 0;
-            for (var i = 0; i < len; i++) {
-                total += Number(arrprice[i]);
+            for (var i = 0; i < arrNprice; i++) {
+                var qty = Number($("[name=nQty]").eq(i).val());
+                var price = Number($("[name=nPrice]").eq(i).val());
+                total += (qty * price);
             }
             $("#sptotal").text(total.toLocaleString());
         },
         Reset: function () {
-            $("#hidId").val('');
-            $("#hidPrice").val('');
-            $("#hidType").val('');
-            $("#btnOrder > button").remove();
+            $("#tbody1 > tr").remove();
             Page.CalculateTotalPrice();
         },
         Save: function (type) {
-            var hid = $("#hidId").val();
-            var hprice = $("#hidPrice").val();
-            var htype = $("#hidType").val();
-
-            var data = Utill.Ajax("@Url.Action("Save")", { id: hid, price: hprice, type: htype, pay: type });
-            if(data == true)
-            {
-                Page.Reset();
-            }
-            else {
-                alert('Fail..');
+            var arrNprice = $("[name=nPrice]").length;
+            if (arrNprice > 0) {
+                var arrId = new Array();
+                var arrPrice = new Array();
+                var arrQty = new Array();
+                for (var i = 0; i < arrNprice; i++) {
+                    var id = $("[name=nPrice]").eq(i).attr("id").replace("hid_", "");
+                    //가격, 수량
+                    var price = $("#hid_price_" + id).val();
+                    var qty = $("#hid_" + id).val();
+                    arrId.push(id);
+                    arrPrice.push(price);
+                    arrQty.push(qty);
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Save")",
+                    datatype: "json",
+                    traditional: true,
+                    data: { id: arrId, price: arrPrice, qty: arrQty, pay: type },
+                    success: function (data) {
+                        if (data) {
+                            Page.Reset();
+                        }
+                        else {
+                            alert('Fail..');
+                        }
+                    },
+                    error: function (e) {
+                        console.log(e);
+                        alert("통신에러가 발생했습니다.(" + url + ")");
+                    }
+                });
+                
             }
         }
     }
-    </script>
+</script>
 }
