@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net.Mail;
+using System.Text;
 using System.Web.Mvc;
 using MongoDB.Bson;
 using SND.Dac;
@@ -85,6 +87,23 @@ namespace SND.Controllers
                 result = false;
             }
             return Json(result);
+        }
+
+        public JsonResult Email()
+        {
+            MailMessage mail = new MailMessage();
+            mail.From = new MailAddress("aka.tomochan@gmail.com", "tomochan");
+            mail.To.Add(new MailAddress("dj_tomochan@naver.com"));
+            mail.Subject = "Test 입니다.";
+            mail.IsBodyHtml = true;
+            mail.Body = "<h1>Test</h1>";
+            mail.SubjectEncoding = Encoding.UTF8;
+            mail.BodyEncoding = Encoding.UTF8;
+            SmtpClient client = new SmtpClient("smtp-pulse.com");
+            client.Credentials = new System.Net.NetworkCredential("aka.tomochan@gmail.com", "WdnL32A3dWB");
+            client.Port = 2525;
+            client.Send(mail);
+            return Json("");
         }
     }
 }
